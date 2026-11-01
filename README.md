@@ -1,4 +1,4 @@
-# Vanderer
+# VANDERER: Map-Free Exploration using Future-Aware and Visual-Curiosity-Guided Diffusion Policy
 
 Vanderer is a visual exploration method for robots. It guides a diffusion navigation policy using a world model that predicts future states.
 

@@ -1,0 +1,49 @@
+# Weights and datasets: keep the empty folders only
+/checkpoints/*
+!/checkpoints/policy/
+!/checkpoints/world_model/
+/checkpoints/policy/*
+/checkpoints/world_model/*
+!/checkpoints/**/.gitkeep
+/data/*
+!/data/.gitkeep
+
+# Data splits: keep the trajectory lists, not caches or links to shared data
+train/vint_train/data/data_splits/**
+!train/vint_train/data/data_splits/**/
+!train/vint_train/data/data_splits/**/traj_names.txt
+
+# Run outputs
+train/logs/
+train/wandb/
+wandb/
+explore/rollout_output/
+explore/verify_output/
+explore/exploration_output/
+explore/plots/
+outputs/
+
+# Weights and media
+*.pth
+*.pth.tar
+*.ckpt
+*.jpg
+*.png
+*.mp4
+*.gif
+*.xcf
+!assets/**
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+build/
+dist/
+.pytest_cache/
+.ruff_cache/
+.venv/
+.env
+
+# Editor
+.vscode/

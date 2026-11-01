@@ -1,0 +1,20 @@
+# CARLA side: the drive_*.py scripts, data generation and metrics. Models use environment.yml.
+# The carla package comes from the wheel in your CARLA 0.9.15 install; see the README.
+name: vanderer-carla
+channels:
+  - defaults
+dependencies:
+  - python=3.7
+  - pip
+  - pip:
+      - gymnasium==0.28.1
+      - matplotlib==3.5.3
+      - msgpack==1.0.5
+      - networkx==2.6.3
+      - numpy==1.21.6
+      - opencv-python-headless
+      - Pillow==9.5.0
+      - pyzmq==26.2.1
+      - scipy==1.7.3
+      - SciencePlots==2.1.1
+      - shapely==2.0.7

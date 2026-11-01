@@ -1,0 +1,144 @@
+project_name: forward_model
+run_name: finetune_nomad
+
+# Released NoMaD weights. train.py loads orig_latest.pth and ema_latest.pth from this
+# folder; they are symlinks to checkpoints/nomad.pth and nomad_ema.pth (identical files).
+load_run: ${checkpoints}/nomad_release
+finetune: True # fresh optimizer/scheduler from this config instead of restoring any
+
+# training setup -- mirrors carla_finetune_new.yaml
+use_wandb: True
+train: True
+batch_size: 256
+eval_batch_size: 256
+epochs: 50
+gpu_ids: "auto"
+num_workers: 8 # up from 4: this path decodes 5 JPEGs per sample rather than reading cached latents
+eval_num_workers: 2
+lr: 0.0001
+optimizer: adamw
+weight_decay: 0.05
+clipping: False
+max_norm: 1.
+scheduler: "onecycle"
+warmup_fraction: 0.0
+div_factor: 1.0
+final_div_factor: 100
+warmup: False
+seed: 0
+
+# model params -- fixed by the released checkpoint, which loads strict=True:
+#   positional_encoding (1, 5, 256) -> context_size 3
+#   noise_pred_net.final_conv out 2 -> learn_angle False
+#   4 sa layers, ff 1024 = 4 * 256, down_dims [64, 128, 256]
+#   attention heads are not recoverable from weight shapes; 4 is NoMaD's own value
+model_type: nomad
+vision_encoder: nomad_vint
+encoding_size: 256
+obs_encoder: efficientnet-b0
+attn_unet: False
+cond_predict_scale: False
+mha_num_attention_heads: 4
+mha_num_attention_layers: 4
+mha_ff_dim_factor: 4
+mha_dropout: 0.1 # NoMaD's own value (nn.TransformerEncoderLayer default)
+down_dims: [64, 128, 256]
+
+# diffusion model params
+num_diffusion_iters: 10
+
+# mask
+goal_mask_prob: 0.5 # NoMaD's own value: goal-conditioned and exploration modes in one policy
+
+# normalization for the action space
+normalize: True
+
+# context
+context_type: temporal
+context_size: 3
+alpha: 1e-4
+
+# distance bounds for distance and action and distance predictions
+distance:
+  min_dist_cat: 0
+  max_dist_cat: 20
+action:
+  min_dist_cat: 3
+  max_dist_cat: 20
+
+# action output params
+len_traj_pred: 8
+learn_angle: False
+
+# dataset specific parameters
+image_size: [96, 96] # NoMaD's native input size
+
+datasets:
+  carla_town6:
+    data_folder: ${data_root}/carla_town6
+    train: ${data_splits}/carla_town6/train/ # path to train folder with traj_names.txt
+    test: ${data_splits}/carla_town6/test/ # path to test folder with traj_names.txt
+    waypoint_spacing: 2
+    end_slack: 3 # because many trajectories end in collisions
+    goals_per_obs: 1 # how many goals are sampled per observation
+    negative_mining: False # negative mining from the ViNG paper (Shah et al.)
+
+  carla_town7:
+    data_folder: ${data_root}/carla_town7
+    train: ${data_splits}/carla_town7/train/ # path to train folder with traj_names.txt
+    test: ${data_splits}/carla_town7/test/ # path to test folder with traj_names.txt
+    waypoint_spacing: 2
+    end_slack: 3 # because many trajectories end in collisions
+    goals_per_obs: 1 # how many goals are sampled per observation
+    negative_mining: False # negative mining from the ViNG paper (Shah et al.)
+
+  carla_town10:
+    data_folder: ${data_root}/carla_town10
+    train: ${data_splits}/carla_town10/train/ # path to train folder with traj_names.txt
+    test: ${data_splits}/carla_town10/test/ # path to test folder with traj_names.txt
+    waypoint_spacing: 2
+    end_slack: 3 # because many trajectories end in collisions
+    goals_per_obs: 1 # how many goals are sampled per observation
+    negative_mining: False # negative mining from the ViNG paper (Shah et al.)
+
+  carla_town11:
+    data_folder: ${data_root}/carla_town11
+    train: ${data_splits}/carla_town11/train/ # path to train folder with traj_names.txt
+    test: ${data_splits}/carla_town11/test/ # path to test folder with traj_names.txt
+    waypoint_spacing: 2
+    end_slack: 3 # because many trajectories end in collisions
+    goals_per_obs: 1 # how many goals are sampled per observation
+    negative_mining: False # negative mining from the ViNG paper (Shah et al.)
+
+  carla_town12:
+    data_folder: ${data_root}/carla_town12
+    train: ${data_splits}/carla_town12/train/ # path to train folder with traj_names.txt
+    test: ${data_splits}/carla_town12/test/ # path to test folder with traj_names.txt
+    waypoint_spacing: 2
+    end_slack: 3 # because many trajectories end in collisions
+    goals_per_obs: 1 # how many goals are sampled per observation
+    negative_mining: False # negative mining from the ViNG paper (Shah et al.)
+
+  carla_town1:
+    data_folder: ${data_root}/carla_town1
+    test_unseen: ${data_splits}/carla_town1/test/
+    waypoint_spacing: 2
+    end_slack: 3
+    goals_per_obs: 1
+    negative_mining: False
+
+
+# logging stuff
+## =0 turns off
+print_log_freq: 1000 # in iterations; stdout only for eval, which logs once per epoch
+image_log_freq: 10000 # in iterations
+num_images_log: 4 # number of images to log
+pairwise_test_freq: 0 # in epochs
+# Score the whole test and test_unseen splits. eval_fraction truncates with islice over
+# a non-shuffled DDP sampler, so 0.25 was not a random quarter -- it was a prefix of the
+# index, covering only 4 of the 13 test trajectories and leaving SeasideTown (half of
+# test_unseen) unevaluated.
+eval_fraction: 1.0
+wandb_log_freq: 100 # in iterations
+eval_freq: 1 # in epochs
+save_freq: 10 # in epochs; checkpoint writes, independent of eval_freq

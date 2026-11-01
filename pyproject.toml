@@ -1,0 +1,20 @@
+[build-system]
+requires = ["setuptools>=64"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "vanderer"
+version = "0.1.0"
+requires-python = ">=3.10"
+
+[tool.setuptools]
+py-modules = ["vanderer_paths"]
+package-dir = {"" = "train"}
+
+[tool.setuptools.packages.find]
+where = ["train", "third_party/nwm"]
+namespaces = true
+include = ["vint_train*", "expnav*", "nwm*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

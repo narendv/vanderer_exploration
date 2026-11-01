@@ -1,0 +1,39 @@
+
+action_stats:
+  min: [-0.5, -1.5] # [min_dx, min_dy]
+  max: [1.5, 1.5] # [max_dx, max_dy]
+
+tartan_drive:
+  metric_waypoint_spacing: 0.72
+
+# All CARLA towns share these settings
+carla_town1: &carla
+  metric_waypoint_spacing: 0.40
+  # OPTIONAL (FOR VISUALIZATION ONLY)
+  camera_metrics: # https://docs.opencv.org/4.x/dc/dbb/tutorial_py_calibration.html
+    camera_height: 1.982 # meters
+    camera_x_offset: 1.00 # distance between the center of the robot and the forward facing camera
+    camera_matrix:
+      fx: 160.0
+      fy: 160.0
+      cx: 160.0
+      cy: 120.0
+    dist_coeffs:
+      k1: 0.0
+      k2: 0.0
+      p1: 0.0
+      p2: 0.0
+      k3: 0.0
+
+carla_town2: *carla
+carla_town3: *carla
+carla_town4: *carla
+carla_town5: *carla
+carla_town6: *carla
+carla_town7: *carla
+carla_town10: *carla
+carla_town11: *carla
+carla_town12: *carla
+
+
+# add your own dataset params here:
